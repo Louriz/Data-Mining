@@ -1,0 +1,29 @@
+source:  https://stat.ethz.ch/pipermail/r-help/2003-August/038254.html
+
+You can identify your outliers with the boxplot function itself. Here is an
+example:
+(you can just copy it and paste it into R)
+
+# This generates a rondom variable x with 10 elements
+
+x = rnorm(100)
+boxplot(x) # you shouldn't see any outliers here although sometimes yow will
+
+# lets add some outliers intentionally
+x = c(21, 20, 25, x) # now 10, 15 and 20 are outliers
+
+myboxplot <- boxplot(x) # now you should see your three outliers
+
+myboxplot$out # it will print the values of the outliers
+
+# additionally, myboxplot stores a series of other useful statistics, try
+
+names(myboxplot)
+
+# you shold get something like
+# [1] "stats" "n"     "conf"  "out"   "group" "names"
+# try for example
+
+myboxplot$stats
+
+# Hope this is useful to you.
