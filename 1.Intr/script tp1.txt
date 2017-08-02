@@ -1,0 +1,50 @@
+#======================== TP1: F3B Data Mining=======================================
+#=======================Riahi LOURIZ & Cheick Diakite Mohamed =======================================
+# Q.3: load data from the file
+
+tips <- read.csv("tips.csv", header=TRUE, sep=",")
+# to know the class of the object we are working on
+class(tips)
+# :give a description about our dataframe 
+# we have 244 obs with 7 variables (2 numerical, 4 factors and 1 integer)
+str(tips)
+
+# Q.4 :create a new variable names tip_rate 
+tips$tip_rate<-(tips$tip)/(tips$total_bill)
+# show tip_rate values
+tips$tip_rate
+# show the first 6 rows
+head(tips)
+
+#Q.5:  univariate summaries :some statistics about each numerical variable,
+#... for factor we have the occurence of each modality
+summary(tips)
+
+#Q.6: plot the distribution of day:
+barplot(prop.table(table(tips$day)))
+
+#Q.7 : plot tip against the total_bill
+plot(tips$total_bill,tips$tip,xlab="total_bill",ylab="tip")
+
+#Q.8 : boxplot
+## for tip
+boxplot(tips$tip,data=tips, main="Distribution of tips",ylab="Tip values")
+## for total_bill
+boxplot(tips$total_bill,data=tips, main="Distribution of total_bill",ylab="total_bill values")
+
+## both
+boxplot(tips$tip~tips$day,data=tips, main="Distribution of tips vs days",ylab="tip values", xlab="Days")
+
+
+#Q.9 :
+hist(tips$total_bill)
+hist(tips$tip, col="light blue")
+### this restaurant is not expensive, because the tips values are not very important 
+par(mfrow=c(2,3))
+hist(tips$tip, breaks=7, col='light blue')
+hist(tips$tip, breaks=9, col='light blue')
+hist(tips$tip, breaks=11, col='light blue')
+hist(tips$tip, breaks=13, col='light blue')
+hist(tips$tip, breaks=15, col='light blue')
+hist(tips$tip, breaks=20, col='light blue')
+par(op) 
