@@ -1,5 +1,5 @@
 #======================== TP1: F3B Data Mining=======================================
-#=======================Riahi LOURIZ & Cheick Diakite Mohamed =======================================
+#=======================Riahi LOURIZ =======================================
 # Q.3: load data from the file
 
 tips <- read.csv("tips.csv", header=TRUE, sep=",")
