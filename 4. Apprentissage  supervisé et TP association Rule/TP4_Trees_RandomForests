@@ -1,0 +1,108 @@
+##############Lab4: Decision Trees and Random Forests####################
+
+
+
+
+#==================Question.8======================================
+###block 1
+test$Survived <- NA # replace all values of Survived by NA
+combi <- rbind(train, test)# concate train and test dataframes by columns
+combi$Name <- as.character(combi$Name) #  before executing this line, if we run
+# class(combi$Name) we get factor, so it is Name is considered as a factor( categorical variable)
+#but it is nor. Hence, we must change its class to characher, to do so we apply 
+# as.character function
+
+### block2
+combi$Title <- sapply(combi$Name, FUN=function(x) {strsplit(x, split='[,.]')[[1]][2]})
+# we split using . and , then we take the seconde word in each x
+combi$Title <- sub(' ', '', combi$Title)
+# sub perform replacement. it will change only the value ' the Countess' to 'theCountes'
+combi$Title[combi$Title %in% c('Mme', 'Mlle')] <- 'Mlle'
+#when Title value is in the c, then change this value by 'Mlle'
+combi$Title[combi$Title %in% c('Capt', 'Don', 'Major', 'Sir')] <- 'Sir'
+combi$Title[combi$Title %in% c('Dona', 'Lady', 'theCountess', 'Jonkheer')] <- 'Lady'
+# there was an error in 'theCountess', it should be without space.
+combi$Title <- factor(combi$Title)
+
+
+### block3
+
+combi$FamilySize <- combi$SibSp + combi$Parch + 1
+# 1 is for the current person
+# create a new variable FamilySize that contains the total number of members in a family
+
+
+###block 4:
+
+combi$Surname <- sapply(combi$Name, FUN=function(x) {strsplit(x, split='[,.]')[[1]][1]})
+# create a new variable Surname that contains the first word in the split indicated previously
+combi$FamilyID <- paste(as.character(combi$FamilySize), combi$Surname, sep="")
+# create a new variable (character) that contains the familiysize followed by the surname family
+combi$FamilyID[combi$FamilySize <= 2] <- 'Small'
+# if FamilySize<=2, then put the FamilyID as 'Small'
+famIDs <- data.frame(table(combi$FamilyID))
+# create a dataframe, with the name famIDs, wich takes its columns from the table function
+famIDs <- famIDs[famIDs$Freq <= 2,]
+# select just the familiy IDs whose frequencies are below or equal to 2
+combi$FamilyID[combi$FamilyID %in% famIDs$Var1] <- 'Small'
+# assign 'Small' to those FamilyID
+combi$FamilyID <- factor(combi$FamilyID)
+
+
+
+###block5
+summary(combi$Age)
+Agefit <- rpart(Age ~ Pclass + Sex + SibSp + Parch + Fare + Embarked + Title + FamilySize,
+data=combi[!is.na(combi$Age),], method="anova")
+combi$Age[is.na(combi$Age)] <- predict(Agefit, combi[is.na(combi$Age),])
+# this block predict the na values for age using decision trees
+
+
+
+###block6:
+summary(combi)
+summary(combi$Embarked)
+# 2 elements are: ''
+which(combi$Embarked == '')
+# gives the position of elements that are ''
+combi$Embarked[c(62,830)] = "S"
+# replace elements in positions specified in c by "S" ( S is the most popular)
+combi$Embarked <- factor(combi$Embarked)
+summary(combi$Fare)
+which(is.na(combi$Fare))
+combi$Fare[1044] <- median(combi$Fare, na.rm=TRUE)
+
+
+### block 7:
+
+combi$FamilyID2 <- combi$FamilyID
+combi$FamilyID2 <- as.character(combi$FamilyID2)
+combi$FamilyID2[combi$FamilySize <= 3] <- 'Small'
+combi$FamilyID2 <- factor(combi$FamilyID2)
+
+#### block 8
+train <- combi[1:891,]
+test <- combi[892:1309,]
+# reconstruct train and test datasets.
+
+
+#==============================Question9===================
+library(randomForest)
+set.seed(415)
+fit <- randomForest(as.factor(Survived) ~ Pclass + Sex + Age + SibSp + Parch + Fare +
+Embarked + Title + FamilySize + FamilyID2,data=train, importance=TRUE, ntree=2000)
+varImpPlot(fit)
+Prediction <- predict(fit, test)
+submit <- data.frame(PassengerId = test$PassengerId, Survived = Prediction)
+write.csv(submit, file = "firstforest.csv", row.names = FALSE)
+
+
+
+
+#====================Question.10=========================
+set.seed(415)
+fit <- cforest(as.factor(Survived) ~ Pclass + Sex + Age + SibSp + Parch + Fare + Embarked +
+Title + FamilySize + FamilyID, data = train, controls=cforest_unbiased(ntree=2000, mtry=3))
+
+
+

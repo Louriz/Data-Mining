@@ -1,0 +1,4 @@
+Hello,
+My name is Riahi LOURIZ 
+I am new to this field of text mining
+these are some notebooks that can help you to learn NLP.

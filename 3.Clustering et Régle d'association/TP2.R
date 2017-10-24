@@ -89,7 +89,7 @@ hopkins(ruspini, n = nrow(ruspini)-1)
 ### we get a value of: 0.22, so according to the rule above, we can confirm again 
 ### that our data is clusterable
 library(factoextra)
-set.seed(2)  # to fix the probel of having different result after each execution
+#set.seed(2)  # to fix the probel of having different result after each execution
 km.res1 <- kmeans(ruspini, 4,iter.max=10)
 fviz_cluster(list(data = ruspini, cluster = km.res1$cluster),frame.type = "norm", geom = "point", stand = FALSE)
 ## as we run many times, each time we get different clusters ( using the same number of clusters 4)
@@ -100,8 +100,9 @@ fviz_cluster(list(data = ruspini, cluster = km.res1$cluster),frame.type = "norm"
 
 
 #==========================Q.4:fix issue in Q.3=================================
-set.seed(2)  # to fix the probel of having different result after each execution
-km.res1 <- kmeans(ruspini, 4)
+# to fix the probel of having different result after each execution, we will add 
+# the parameter nstart that consist of choosing the initila centroids many times
+km.res1 <- kmeans(ruspini, 4,nstart=100)
 fviz_cluster(list(data = ruspini, cluster = km.res1$cluster),frame.type = "norm", geom = "point", stand = FALSE)
 
 
@@ -119,7 +120,7 @@ silhouette_function <- function(data,alg){
 plot.new()
 op <- par(mfrow= c(3,3), oma= c(0,0, 3, 0),mgp= c(1.6,.8,0), mar= .1+c(4,2,2,2))
 for (k in 2:8)
-	plot(silhouette(alg(scale(data),k)$cluster, dist(data)),main=" ")
+	plot(silhouette(alg(scale(data),k,nstart=100)$cluster, dist(data)),main=" ")
 mtext("Silhouette plot",
       outer = TRUE, font = par("font.main"), cex = par("cex.main")); frame()
 
@@ -132,7 +133,7 @@ elbow_function<-function(data,alg){     # alg is the algorithme which will be us
 k.max <- 15 # Maximal number of clusters
 
 wss <- sapply(1:k.max, 
-        function(k){alg(scale(data), k )$tot.withinss})
+        function(k){alg(scale(data), k,nstart=100 )$tot.withinss})
 plot(1:k.max, wss,
        type="b", pch = 19, frame = FALSE, 
        xlab="Number of clusters K",
@@ -162,8 +163,14 @@ summary(intern)
 
 fit1<-pam(scale(ruspini),4)
 attributes(fit1) # to see attributes of fit1
+fit1$medoids
+head(fit1$clustering)
 
-
+#plot result
+plot(fit1)
+# other plot
+fviz_cluster(fit1)
+             
 
 #========================= Q.7:  
 head(food)
@@ -182,6 +189,14 @@ hopkins(food, n = nrow(food)-1) # gives 0.20 (  if we run many times we get diff
 silhouette_function(food.scaled,pam)
 silhouette_function(food.scaled,kmeans)
 elbow_function(food.scaled,kmeans)
+# la valeur pour le nombre de cluster n'est pas evidente
+elbow_function(food,kmeans)
+## kmean for food
+km.res2 <- kmeans(food, 4,nstart=100)
+fviz_cluster(list(data = food, cluster = km.res2$cluster),frame.type = "norm", geom = "point", stand = FALSE)
+
+
+
 
 library(clValid)
 clmethods <- c("kmeans","pam")
@@ -226,11 +241,12 @@ food.scaled<-scale(food)
 ###
 # Dissimilarity matrix
 
+
 d <- dist(food.scaled, method = "euclidean")
 # Hierarchical clustering using Ward's method
 res.hc <- hclust(d, method = "ward.D2" )
 # Plot the obtained dendrogram
-plot(res.hc, cex = 0.6, hang = -1)
+plot(res.hc,labels=food$Name ,cex = 0.6, hang = -1)
 
 ### comments:================================================================
 #### the plot contains 27 leaves (which is exactly the number of observation)
@@ -303,4 +319,51 @@ tanglegram(dend1, dend2,
   main = paste("entanglement =", round(entanglement(dend_list), 2))
   )
 ### avalue of 0.16====>  good alignment because near to 0
+####################################################################
+##############################################################""####
+######### food data#####
+# using internal validation :
+library(clValid)
+clmethods <- c("kmeans","pam","hierarchical")
+intern <- clValid(food.scaled, nClust = 2:8,
+              clMethods = clmethods, validation = "internal")
+# Summary
+summary(intern)
+#result :  hierarchical is the best one for all the criteria ( with a 2 clusters)
+#what creteria to choose? 
+
+#using stability measures:
+# Stability measures
+clmethods <- c("hierarchical","kmeans","pam")
+stab <- clValid(food.scaled, nClust = 2:6, clMethods = clmethods, 
+                validation = "stability")
+# Display only optimal Scores
+optimalScores(stab)
+
+# result :
+##hierarchical  ( with 2 clusters) for APN and ADM
+## AD: pam with 6 clusters 
+## FOM : pam with 5 clusters 
+#### here we choose APN because it is the smallest value===> 
+
+
+######### ruspini data#####################
+library(clValid)
+clmethods <- c("kmeans","pam","hierarchical")
+intern <- clValid(ruspini, nClust = 2:8,
+              clMethods = clmethods, validation = "internal")
+# Summary
+summary(intern)
+
+
+#using stability measures:
+# Stability measures
+clmethods <- c("hierarchical","kmeans","pam")
+stab <- clValid(ruspini, nClust = 2:6, clMethods = clmethods, 
+                validation = "stability")
+# Display only optimal Scores
+optimalScores(stab)
+
+
+
 
