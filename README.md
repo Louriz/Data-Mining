@@ -2,7 +2,7 @@
 ### This is a Python implementation for all Labs of Data Mining course at IMT Atlantique
 ### The current version, which is in Python, is written by :
 * Riahi LOURIZ ( Student at IMT Atlantique, Data Science): riahi.louriz@telecom-bretagne.eu
-### The original version was written in R language by :
+### Lectures and  the original version of all labs was written in R language by :
 * Romain Billot : romain.billot@telecom-bretagne.eu
 * Yannis Haralambous : yannis.haralambous@telecom-bretagne.eu
 * Philippe Lenca : philippe.lenca@telecom-bretagne.eu
