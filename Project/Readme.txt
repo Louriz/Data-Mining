@@ -11,7 +11,11 @@
 Some times you will need to install some libraries (python) or packages (R) : 
 * For python : !pip install library_name
 * For R      : install.packages("package_name")
-
+## files : 
+* All files with the extension .ipynb are the notebooks to be used.
+* ACM_MOOC.pdf (using R language) is the case study for the lab3
+* images files are just some images that i have included in the  notebooks.
+* dataset.xlsx : dataset to be used in ACM_MOOC.pdf
 
 ## Lab 1: Classifier evaluation
 Preparing, preprocessing, understanding data, feature engineering and modeling are considered as a very important steps in machine learning. However, a Data scientist should be very aware about the results of his model and the way how to interpret its results. This lab covers evaluation and model selection methods that you can use to help understand and optimize the performance of your machine learning models.
